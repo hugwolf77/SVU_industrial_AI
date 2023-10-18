@@ -2,11 +2,7 @@
 import datetime
 import torch
 import cv2
-import torch.backends.cudnn as cudnn
-from PIL import Image
-import colorsys
 import numpy as np
-import math
 
 from super_gradients.training import models
 from super_gradients.common.object_names import Models
@@ -18,7 +14,7 @@ device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("
 model = models.get("yolo_nas_l", pretrained_weights="coco").to(device)
 conf_treshold = 0.70
 # tracker 설정 : max_age는 최대 몇 프레임까지 인정할지
-tracker = DeepSort(max_age=50)
+tracker = DeepSort(max_age=70, embedder='torchreid')
 
 # video 설정
 video_path = "people.mp4"
@@ -115,7 +111,7 @@ while True:
     # Show the frame
     cv2.imshow("Frame", frame)
     # Write the frame to the output video file
-    writer.write(frame)
+    # writer.write(frame)
     # Check for 'q' key press to exit the loop
     if cv2.waitKey(1) == ord("q"):
         break
