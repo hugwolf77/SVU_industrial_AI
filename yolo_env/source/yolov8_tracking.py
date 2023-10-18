@@ -15,9 +15,16 @@ coco128.close()
 model = YOLO('./yolov8_pretrained/yolov8n.pt')
 tracker = DeepSort(max_age=50)
 
-cap = cv2.VideoCapture(0)
+
+video_path = "people.mp4"
+cap = cv2.VideoCapture(video_path)
+
+if not cap.isOpened():
+    print("Error video file")
+    
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+fps = cap.get(cv2.CAP_PROP_FPS)
 
 while True:
     start = datetime.datetime.now()
