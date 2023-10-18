@@ -107,8 +107,7 @@ Roboflow A100 데이터셋에서 검출능력 확인
 	pip install super-gradients
 ```
 
-
-- Fine tunning 및 커스텀 traing에 참고되는 Reference 예제 너TUBE
-https://youtu.be/PBh9MFH2lB4?si=F0xY48Dp_xnDR2IP
+- Fine tunning 및 커스텀 traing에 참고되는 Reference 예제 너TUBE \
+https://youtu.be/PBh9MFH2lB4?si=F0xY48Dp_xnDR2IP \
 https://youtu.be/st9o5XqqNno?si=vqZRaG2QpA5FmEUV
 
