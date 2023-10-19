@@ -14,7 +14,7 @@ device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("
 model = models.get("yolo_nas_l", pretrained_weights="coco").to(device)
 conf_treshold = 0.70
 # tracker 설정 : max_age는 최대 몇 프레임까지 인정할지
-tracker = DeepSort(max_age=70, embedder='torchreid')
+tracker = DeepSort(max_age=70) #, embedder='torchreid')
 
 # video 설정
 video_path = "people.mp4"
