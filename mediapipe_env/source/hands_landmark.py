@@ -63,7 +63,7 @@ while (cap.isOpened()):
                 cx, cy = int(lmk.x*w), int(lmk.y*h)                     # 해당 landmark의 좌표값을 곱해서 표시할 위치 확인
                 # print(id, cx, cy)                                       # 해당 landmark의 위치 표시
                 if id==0:                                               # 표시하고 싶은 손의 landmark 위치 지정 현재는 손바닥 중심(0번)
-                    cv2.circle(frame,(cx,cy),30,(255,0,255),cv2.FILLED )  # 해당 위치에 원 표시
+                    cv2.circle(frame,(cx,cy),15,(255,0,255),cv2.FILLED )  # 해당 위치에 원 표시
             mpDraw.draw_landmarks(frame, handLMK, mpHands.HAND_CONNECTIONS
                                   ,mp_drawing_styles.get_default_hand_landmarks_style()
                                   ,mp_drawing_styles.get_default_hand_connections_style()) # mediapipe  draw 클래스로 landmark 위치점들 연결선 그리기
@@ -72,7 +72,7 @@ while (cap.isOpened()):
     count_time = elapsed_time
 
     cv2.putText(frame,str(int(fps)),(20,140),cv2.FONT_HERSHEY_PLAIN        # 프레임 처리시간 표시
-                , 6, (255,0,255),3)
+                , 3, (255,0,255),3)
 
     process_time = time.time() - start_time
     elapsed_time += process_time   # 총 경과시간 누적
@@ -82,7 +82,7 @@ while (cap.isOpened()):
     if save_result is not None:
         writer.write(frame)
         
-    cv2.imshow(frame)
+    cv2.imshow("Frame", frame)
     if cv2.waitKey(1) == ord("q"):
         break
     

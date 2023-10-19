@@ -16,7 +16,7 @@ model = YOLO('./yolov8_pretrained/yolov8n.pt')
 tracker = DeepSort(max_age=50)
 
 
-video_path = "people.mp4"
+video_path = 0
 cap = cv2.VideoCapture(video_path)
 
 if not cap.isOpened():

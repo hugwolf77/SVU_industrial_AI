@@ -11,13 +11,14 @@ from deep_sort_realtime.deepsort_tracker import DeepSort
 # GPU 설정
 device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
 # 모델 설정
-model = models.get("yolo_nas_l", pretrained_weights="coco").to(device)
+# Models.YOLO_NAS_S , "yolo_nas_l"
+model = models.get(Models.YOLO_NAS_S, pretrained_weights="coco").to(device)
 conf_treshold = 0.70
 # tracker 설정 : max_age는 최대 몇 프레임까지 인정할지
-tracker = DeepSort(max_age=70) #, embedder='torchreid')
+tracker = DeepSort(max_age=50) #, embedder='torchreid')
 
 # video 설정
-video_path = "people.mp4"
+video_path = 0
 cap = cv2.VideoCapture(video_path)
 # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
@@ -26,10 +27,9 @@ frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 fps = cap.get(cv2.CAP_PROP_FPS)
 
 # 코덱 및 비디오 쓰기 설정
-output_path = "output.mp4"
-fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-writer = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
-fuse_model=False
+# output_path = "output.mp4"
+# fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+# writer = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
 
 # coco classname 정보 => Yaml 로 교체
 coco128 = open('./yolov8_pretrained/coco128.txt', 'r')
@@ -38,8 +38,8 @@ class_list = classNames.split('\n')
 coco128.close()
 
 class_id = 0  # 사람만 지정
-iou=0.5
-conf= 0.5
+iou=0.3
+conf= 0.4
 
 # Create a list of random colors to represent each class
 np.random.seed(42)  # to get the same colors
@@ -118,7 +118,7 @@ while True:
 
 # Release video capture and video writer objects
 cap.release()
-writer.release()
+# writer.release()
 
 # Close all windows
 cv2.destroyAllWindows()
