@@ -10,7 +10,7 @@ classNames = data.split('\n')
 coco128.close()
 
 # model
-model = YOLO("yolo-Weights/yolov8n.pt")
+model = YOLO("./yolov8_pretrained/yolov8n.pt")
 
 video_path = 0
 cap = cv2.VideoCapture(video_path)

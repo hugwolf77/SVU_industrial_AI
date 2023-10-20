@@ -7,7 +7,7 @@ import numpy as np
 from ultralytics import YOLO
 
 # Load the YOLOv8 model
-model = YOLO("yolov8n.pt")
+model = YOLO("./yolov8_pretrained/yolov8n.pt")
 
 # Open the video file
 video_path = 0 #"path/to/video.mp4"
