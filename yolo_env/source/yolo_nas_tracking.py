@@ -52,6 +52,7 @@ while True:
     if not ret:
         print('Cam Error')
         break
+    
     detect = next(iter(model.predict(frame, iou=iou, conf=conf)))
     # Extract the bounding box coordinates, confidence scores, and class labels from the detection results
     bboxes_xyxy = torch.from_numpy(detect.prediction.bboxes_xyxy).tolist()
