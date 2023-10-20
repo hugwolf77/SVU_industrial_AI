@@ -2,5 +2,6 @@
 Lib/
 Scripts/
 share/
+cv2_env/
 
 *.bak
