@@ -12,4 +12,5 @@ created: 2023-10-17 13:29
 ---
 - Python 기초입문
 - 금융-경제 연구 및 분석 
-- Time-Series Deep-Learning 모델 
+- Time-Series Deep-Learning 모델
+- GDP 예측 BIVA 모델 - 김의철 
