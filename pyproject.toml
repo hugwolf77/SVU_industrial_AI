@@ -1,17 +1,14 @@
 [tool.poetry]
 name = "svu-industrial-ai"
 version = "0.1.0"
-description = ""
+description = "It's place for study, research, andgather source together"
 authors = ["Augustine77 <hugwolf77@gmail.com>"]
+license = "GNU, GPL"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.11.8"
-pandas = "^2.2.2"
-seaborn = "^0.13.2"
-finance-datareader = "^0.9.90"
-bs4 = "^0.0.2"
-plotly = "^5.22.0"
+python = "3.11.3"
+pyside6 = "^6.7.0"
 
 
 [build-system]
