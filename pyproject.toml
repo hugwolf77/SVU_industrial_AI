@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "svu-industrial-ai"
+version = "0.1.0"
+description = ""
+authors = ["Augustine77 <hugwolf77@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.8"
+pandas = "^2.2.2"
+seaborn = "^0.13.2"
+finance-datareader = "^0.9.90"
+bs4 = "^0.0.2"
+plotly = "^5.22.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
