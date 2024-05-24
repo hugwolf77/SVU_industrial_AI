@@ -10,7 +10,7 @@ from PySide6.QtUiTools import QUiLoader
 
 from sqlalchemy import select
 from DB.connect import conn_DB
-from DB.DBmodel.dataTB import dataTB
+from DB.DBmodel.dataTB import (Base, ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2)
 
 
 class Client(QWidget):
@@ -78,13 +78,12 @@ class Client(QWidget):
         # view widget table setting
         self.window.tableWidget.setColumnCount(7)
         self.window.tableWidget.setHorizontalHeaderLabels(
-                        ["Index", "TIMESTAMP", "FLOW_ID", "SOURCE_IP",
-                         "SOURCE_PORT", "DESTINATION_IP", "DESTINATION_PORT"])
+                        ['Index', 'date', 'HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT'])
         
         # 임시 DB 연결과 테이블 조회
         with self.engine.connect() as conn:
             rows = conn.execute(select(
-                        dataTB.Index,
+                        ETT_H_1.Index,
 
                         ).limit(50)).all()
 
@@ -97,7 +96,7 @@ class Client(QWidget):
         #row 리스트만큼 반복하며 Table에 DB 값을 넣는다.
         for x in range(count):
             #리스트 내부의 column쌍은 튜플로 반환하므로 튜플의 각 값을 변수에 저장
-            Index, TIMESTAMP, FLOW_ID, SOURCE_IP, SOURCE_PORT, DESTINATION_IP, DESTINATION_PORT = rows[x]
+            Index, date, HUFL, HULL, MUFL, MULL, LUFL, LULL, OT, = rows[x]
             
             #테이블의 각 셀에 값 입력
             self.window.tableWidget.setItem(x, 0, QTableWidgetItem(str(Index)))
