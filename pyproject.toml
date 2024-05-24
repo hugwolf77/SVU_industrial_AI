@@ -12,6 +12,7 @@ pyside6 = "^6.7.0"
 fastapi = "^0.111.0"
 uvicorn = {extras = ["standard"], version = "^0.29.0"}
 sqlalchemy = "^2.0.30"
+requests = "^2.32.2"
 pytz = "^2024.1"
 numpy = "^1.26.4"
 pandas = "^2.2.2"

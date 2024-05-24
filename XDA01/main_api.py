@@ -1,7 +1,8 @@
-#
+# application main.py
+
+
 import logging
-from client.app import appRun
-from api.service import apiRun
+from api.service import apiRun, shutdown
 from config import Settings
 
 from pytz import timezone
@@ -26,8 +27,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
-    # apiRun(service_url,service_port)
-    # appRun()
+    apiRun(service_url,service_port)
 
     ## init DataBase
     # mig.init_DB()
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     # for df in zip(nameTB,dfList):
     #     mig.migrate(df[0], df[1])
 
-    # comfirm migrated Table
-    migTB = [ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2 ]
-    iDate = '2016-07-01 01:00:00'
-    mig.comfirmTB(migTB[0],iDate)
+    # # comfirm migrated Table
+    # migTB = [ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2 ]
+    # iDate = '2016-07-01 01:00:00'
+    # mig.comfirmTB(migTB[0],iDate)
