@@ -1,8 +1,8 @@
-from data_provider.data_factory import data_provider
-from exp.exp_basic import Exp_Basic
-from models import Informer, Autoformer, Transformer, DLinear, Linear, NLinear
-from utils.tools import EarlyStopping, adjust_learning_rate, visual, test_params_flop
-from utils.metrics import metric
+from ..data_provider.data_factory import data_provider
+from .exp_basic import Exp_Basic
+from ..models import Transformer, DLinear, Linear, NLinear
+from ..utils.tools import EarlyStopping, adjust_learning_rate, visual, test_params_flop
+from ..utils.metrics import metric
 
 import numpy as np
 import pandas as pd
@@ -25,9 +25,7 @@ class Exp_Main(Exp_Basic):
 
     def _build_model(self):
         model_dict = {
-            'Autoformer': Autoformer,
             'Transformer': Transformer,
-            'Informer': Informer,
             'DLinear': DLinear,
             'NLinear': NLinear,
             'Linear': Linear,
@@ -214,12 +212,12 @@ class Exp_Main(Exp_Basic):
         
         if test:
             print('loading model')
-            self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
+            self.model.load_state_dict(torch.load(os.path.join('./MLmodels/checkpoints/' + setting, 'checkpoint.pth')))
 
         preds = []
         trues = []
         inputx = []
-        folder_path = './test_results/' + setting + '/'
+        folder_path = './MLmodels/test_results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
@@ -283,13 +281,13 @@ class Exp_Main(Exp_Basic):
         inputx = np.concatenate(inputx, axis=0)
 
         # result save
-        folder_path = './results/' + setting + '/'
+        folder_path = './MLmodels/test_results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
         mae, mse, rmse, mape, mspe, rse, corr = metric(preds, trues)
         print('mse:{}, mae:{}'.format(mse, mae))
-        f = open("result.txt", 'a')
+        f = open("./MLmodels/test_results/result.txt", 'a')
         f.write(setting + "  \n")
         f.write('mse:{}, mae:{}, rse:{}, corr:{}'.format(mse, mae, rse, corr))
         f.write('\n')
@@ -350,7 +348,7 @@ class Exp_Main(Exp_Basic):
             preds = pred_data.inverse_transform(preds)
         
         # result save
-        folder_path = './results/' + setting + '/'
+        folder_path = './MLmodels/pred_results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 

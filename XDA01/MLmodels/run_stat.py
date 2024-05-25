@@ -1,7 +1,7 @@
 import argparse
 import os
 import torch
-from exp.exp_stat import Exp_Main
+from expBase.exp_stat import Exp_Main
 import random
 import numpy as np
 

@@ -16,9 +16,11 @@ requests = "^2.32.2"
 pytz = "^2024.1"
 numpy = "^1.26.4"
 pandas = "^2.2.2"
+matplotlib = "^3.9.0"
 torch = {version = "^2.3.0+cu121", source = "pytorch"}
 torchvision = {version = "^0.18.0+cu121", source = "pytorch"}
 torchaudio = {version = "^2.3.0+cu121", source = "pytorch"}
+scikit-learn = "^1.5.0"
 
 [[tool.poetry.source]]
 name = "pytorch"

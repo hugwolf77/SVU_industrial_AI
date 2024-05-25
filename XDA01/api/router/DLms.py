@@ -14,7 +14,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from api.model.dataclass import DataInput, PredictOutput
 
+import torch
 from MLmodels.DLM import DLM
+from config import Modelargs
 
 logger = logging.getLogger("service_DMms")
 
@@ -22,10 +24,24 @@ templates = Jinja2Templates(directory="api/templates")
 
 mlModel= {}
 
+args = Modelargs()
+
+args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
+
+if args.use_gpu and args.use_multi_gpu:
+    args.dvices = args.devices.replace(' ', '')
+    device_ids = args.devices.split(',')
+    args.device_ids = [int(id_) for id_ in device_ids]
+    args.gpu = args.device_ids[0]
+
+print(f"model_args : \n {args}")
+
+setLabel = datetime.now().strftime('%Y_%m_%d')
+
 @asynccontextmanager
 async def lifespan(app: APIRouter, NM):
     # Load the ML model
-    mlModel = DLM().predict
+    mlModel = DLM(args).predict(setLabel, load=True)
     yield
     mlModel.clear()
 
@@ -76,7 +92,6 @@ async def chart_data(request: Request):
     response.headers["Cache-Control"] = "no-cache"
     response.headers["X-Accel-Buffering"] = "no"
     return response 
-
 
 @DLms.post("/predict", tags=['DLM'], response_model=PredictOutput)
 async def NN01_predict(request_input: DataInput, request: Request):
