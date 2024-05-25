@@ -4,11 +4,12 @@ sys.path.insert(2,'../MLmodels/DLM')
 import os
 import logging
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
+import signal
 
 # routing path
 from .router.DLms import DLms 
@@ -31,8 +32,19 @@ def index(request: Request):
         request=request, name="index_root.html")
 
 def apiRun(url, port):
-    logger.info(f"!! service server start ")
+    logger.info(f"!! service server start !!")
     uvicorn.run("api.service:api", host=url, port=int(port), reload=True)
+
+
+def shutdown():
+    os.kill(os.getpid(), signal.SIGTERM)
+    logger.info(f"!! service server shutting down !!")
+    return Response(status_code=200, content='Server shutting down...')
+
+@api.on_event('shutdown')
+def on_shutdown():
+    logger.info(f"!! service server shutting down !!")
+    print('Server shutting down...')
 
 if __name__ == "__main__":
     apiRun('127.0.0.1',8000)

@@ -1,16 +1,20 @@
-
 # client app by pyside6
-
 import sys
 import os
+import logging
+# pyside6 window
 from PySide6 import QtCore
 from PySide6.QtCore import QFile, QIODevice 
 from PySide6.QtWidgets import (QApplication, QWidget, QFileDialog, QTableWidget, QTableWidgetItem)
 from PySide6.QtUiTools import QUiLoader
-
+# data read
 from sqlalchemy import select
 from DB.connect import conn_DB
-from DB.DBmodel.dataTB import dataTB
+from DB.DBmodel.dataTB import (Base, ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2)
+import pandas as pd
+# predict request 
+import requests
+import json
 
 
 class Client(QWidget):
@@ -27,20 +31,26 @@ class Client(QWidget):
         super(Client, self).__init__()
         self.window = self.SetupUI()
         self.file_navi = QFileDialog()
-        self.window.setWindowTitle('Data Viewer')
-        self.window.Do.clicked.connect(self.Input_path)
-        self.window.DataShow.clicked.connect(self.DataPlot)
-        self.window.navi_file_path.clicked.connect(self.file_exeplore)
-        
+        self.window.setWindowTitle('TSF_Model_Client')
+        # input data select
+        self.window.path_edit.returnPressed.connect(self.Input_path)
+        self.window.Path_btn.clicked.connect(self.file_exeplore)
+        self.window.select.clicked.connect(self.Select_data)
+        # predict 
+        self.window.predict.clicked.connect(self.Predict_result)
+        # select input data file
+        self.select_data = ''
+        # load data
+        self.Input_data = pd.DataFrame()
         # DB connect
         self.engine = conn_DB()
-        self.setTables()
-        
-        
+        # Predict
+        self.predict_response = []
+        # Graph
         self.window.show()
         
     def SetupUI(self):
-        ui_file_name = resource_path("uirorm/form.ui")
+        ui_file_name = resource_path("client/uiform/form.ui")
         ui_file = QFile(ui_file_name)
         if not ui_file.open(QIODevice.ReadOnly):
             print(f"Cannot open {ui_file_name}: {ui_file.errorString()}")
@@ -55,52 +65,87 @@ class Client(QWidget):
             
     @QtCore.Slot()
     def Input_path(self):
-        edit_path = self.window.File_Path_Edit.text()
+        edit_path = self.window.path_edit.text()
         print(f"Enter Path: {edit_path}")
-        self.window.file_path_print.setText(edit_path)
+        self.window.path_edit.setText(edit_path)
         
     @QtCore.Slot()
     def file_exeplore(self):
         # self.file_navi.show()
-        navi_path = self.file_navi.getOpenFileName(None, "Select File")[0]
-        print(f"Navi Path: {navi_path}")
-        self.window.File_Path_Edit.setText(navi_path)
-        self.window.file_path_print.setText(navi_path)
-        
-    
-    @QtCore.Slot()
-    def DataPlot(self):
-        self.graph.show()
+        self.select_data = self.file_navi.getOpenFileName(None, "Select File")[0]
+        print(f"select_data: {self.select_data}")
+        self.window.path_edit.setText(self.select_data)
+        self.window.edit_path_print.setText(self.select_data)
 
     @QtCore.Slot()
-    def setTables(self):
+    def Select_data(self):
+        print(f"select_data: {self.select_data}")
+        self.window.path_edit.setText(self.select_data)
+        self.window.edit_path_print.setText(self.select_data)
+
+        if os.path.splitext(self.select_data)[1] == '.csv':
+            self.Input_data = pd.read_csv(self.select_data)
+        elif os.path.splitext(self.select_data)[1] == '.xlsx':
+            self.Input_data =  pd.read_excel(self.select_data)
         
         # view widget table setting
-        self.window.tableWidget.setColumnCount(7)
-        self.window.tableWidget.setHorizontalHeaderLabels(
-                        ["Index", "TIMESTAMP", "FLOW_ID", "SOURCE_IP",
-                         "SOURCE_PORT", "DESTINATION_IP", "DESTINATION_PORT"])
+        self.window.input_tableView.setColumnCount(9)
+        self.window.input_tableView.setHorizontalHeaderLabels(
+                        ['Index', 'date', 'HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT'])
         
+        #DB내부에 저장된 결과물의 갯수를 저장한다.        
+        count = self.Input_data.shape[0]
+        
+        #갯수만큼 테이블의 Row를 생성한다.
+        self.window.input_tableView.setRowCount(count)
+        
+        #row 리스트만큼 반복하며 Table에 DB 값을 넣는다.
+        for x in range(count+1):
+            # Input_data DataFrame 내부의 column 각 값을 변수에 저장
+            Index = self.Input_data.iloc[x,:]
+            date  = self.Input_data.iloc[x,:]
+            HUFL  = self.Input_data.iloc[x,:]
+            HULL  = self.Input_data.iloc[x,:]
+            MUFL  = self.Input_data.iloc[x,:]
+            MULL  = self.Input_data.iloc[x,:]
+            LUFL  = self.Input_data.iloc[x,:]
+            LULL  = self.Input_data.iloc[x,:]
+            OT    = self.Input_data.iloc[x,:]
+            
+            #테이블의 각 셀에 값 입력
+            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(Index)))
+            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(date)))
+            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(HUFL)))
+            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(HULL)))
+            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(MUFL)))
+            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(MULL)))
+            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(LUFL)))
+            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(LULL)))
+            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(OT)))
+
+    @QtCore.Slot()
+    def Predict_result(self):
+        header = { 
+            "Content-type" : "application/json",
+            "accept": "application/json",
+        }
+        pred_url = "http://localhost:8000/DLms/predict"
+        params={
+            
+        }
+        response = requests.post(pred_url, json=params, headers=header)
+        print(response.status_code)
+        print(response.json())        
+
+    @QtCore.Slot()
+    def DataPlot(self):
         # 임시 DB 연결과 테이블 조회
         with self.engine.connect() as conn:
             rows = conn.execute(select(
-                        dataTB.Index,
+                        ETT_H_1.Index,
 
-                        ).limit(50)).all()
-
-        #DB내부에 저장된 결과물의 갯수를 저장한다.        
-        count = len(rows)
-        
-        #갯수만큼 테이블의 Row를 생성한다.
-        self.window.tableWidget.setRowCount(count)
-        
-        #row 리스트만큼 반복하며 Table에 DB 값을 넣는다.
-        for x in range(count):
-            #리스트 내부의 column쌍은 튜플로 반환하므로 튜플의 각 값을 변수에 저장
-            Index, TIMESTAMP, FLOW_ID, SOURCE_IP, SOURCE_PORT, DESTINATION_IP, DESTINATION_PORT = rows[x]
-            
-            #테이블의 각 셀에 값 입력
-            self.window.tableWidget.setItem(x, 0, QTableWidgetItem(str(Index)))
+                        ).limit(15)).all()
+        self.graph.show()
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
