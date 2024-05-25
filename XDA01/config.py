@@ -26,13 +26,13 @@ class Modelargs:
     root_path        = './DB/storage/ETT/'     # root path of the data file
     data_path        = 'ETTh1.csv'       # data file
     direct_pred_input = None
-    features         = 'MS'               # forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate
+    features         = 'M'               # forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate
     target           = 'OT'              # target feature in S or MS task
     freq             = 'h'               # freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h
     checkpoints      = './MLmodels/checkpoints/'  # location of model checkpoints
     # forecasting task
     seq_len          = 336        # input sequence length
-    label_len        = 48        # start token length
+    label_len        = 96        # start token length
     pred_len         = 96        # prediction sequence length
     # DLinear
     individual       = False     # DLinear: a linear layer for each variate(channel) individually
@@ -55,11 +55,11 @@ class Modelargs:
     output_attention = True      # whether to output attention in ecoder
     do_predict       = False      # whether to predict unseen future data
     # optimization
-    num_workers   = 10        # data loader num workers
+    num_workers   = 1        # data loader num workers
     itr           = 1         # experiments times
     train_epochs  = 100        # train epochs
     batch_size    = 32        # batch size of train input data
-    patience      = 3         # early stopping patience
+    patience      = 7         # early stopping patience
     learning_rate = 0.005   # optimizer learning rate
     des           = 'Exp'    # exp description
     loss          = 'mse'     # loss function

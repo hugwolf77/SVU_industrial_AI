@@ -8,13 +8,13 @@ from pytz import timezone
 from datetime import datetime
 today = datetime.now(timezone('Asia/Seoul'))
 
-from DB import migrate as mig
-from DB.DBmodel.dataTB import Base, ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2 
+# from DB import migrate as mig
+# from DB.DBmodel.dataTB import Base, ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2 
 
-configs = Settings()
+# configs = Settings()
 
-service_url = configs.SERVICE_URL
-service_port = configs.SERVICE_PORT
+# service_url = configs.SERVICE_URL
+# service_port = configs.SERVICE_PORT
 
 # logging
 logging.basicConfig(

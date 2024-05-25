@@ -1,7 +1,6 @@
 # client app by pyside6
 import sys
 import os
-import logging
 from datetime import datetime
 from pytz import timezone
 
@@ -11,12 +10,11 @@ from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtWidgets import (QApplication, QWidget, QFileDialog, QTableWidget, QTableWidgetItem)
 from PySide6.QtUiTools import QUiLoader
 # data read
-from sqlalchemy import select
-from DB.connect import conn_DB
-from DB.DBmodel.dataTB import (Base, ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2)
+# from sqlalchemy import select
+# from DB.connect import conn_DB
+# from DB.DBmodel.dataTB import (Base, ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2)
 import numpy as np
 import pandas as pd
-from typing import List
 from pydantic import BaseModel, Field
 # predict request 
 import requests
@@ -24,16 +22,15 @@ import json
 
 class DataInput(BaseModel):
     # ReqTime : str = Field(min_length=4, max_length=10)
-    Index : List[int] = Field()
-    date : List[datetime]   = Field() 
-    HUFL : List[float] = Field()
-    HULL : List[float] = Field()
-    MUFL : List[float] = Field()
-    MULL : List[float] = Field()
-    LUFL : List[float] = Field()
-    LULL : List[float] = Field()
-    OT : List[float] = Field()
-
+    Index : list[int]
+    date : list[datetime]
+    HUFL : list[float]
+    HULL : list[float]
+    MUFL : list[float]
+    MULL : list[float]
+    LUFL : list[float]
+    LULL : list[float]
+    OT : list[float] 
 
 class Client(QWidget):
     __MAX_WIN = 1
@@ -61,9 +58,9 @@ class Client(QWidget):
         # load data
         self.Input_data = pd.DataFrame()
         # DB connect
-        self.engine = conn_DB()
+        # self.engine = conn_DB()
         # Predict
-        self.predict_response = []
+        self.predict_response = pd.DataFrame()
         # Graph
         self.window.show()
         
@@ -91,13 +88,13 @@ class Client(QWidget):
     def file_exeplore(self):
         # self.file_navi.show()
         self.select_data = self.file_navi.getOpenFileName(None, "Select File")[0]
-        print(f"select_data: {self.select_data}")
+        # print(f"select_data: {self.select_data}")
         self.window.path_edit.setText(self.select_data)
         self.window.edit_path_print.setText(self.select_data)
 
     @QtCore.Slot()
     def Select_data(self):
-        print(f"select_data: {self.select_data}")
+        # print(f"select_data: {self.select_data}")
         self.window.path_edit.setText(self.select_data)
         self.window.edit_path_print.setText(self.select_data)
 
@@ -153,32 +150,68 @@ class Client(QWidget):
         }
         pred_url = "http://localhost:8000/DLM/predict"
 
-        InputSeq = DataInput(
-                    Index = list(self.Input_data['Index']),
-                    date  = list(self.Input_data['date']),
-                    HUFL  = list(self.Input_data['HUFL']),
-                    HULL  = list(self.Input_data['HULL']),
-                    MUFL  = list(self.Input_data['MUFL']),
-                    MULL  = list(self.Input_data['MULL']),
-                    LUFL  = list(self.Input_data['LUFL']),
-                    LULL  = list(self.Input_data['LULL']),
-                    OT    = list(self.Input_data['OT']),
-                    )
+        reqData = {
+                    "Index" : list(self.Input_data['Index']),
+                    "date"  : list(self.Input_data['date'].astype(str)),
+                    "HUFL"  : list(self.Input_data['HUFL']),
+                    "HULL"  : list(self.Input_data['HULL']),
+                    "MUFL"  : list(self.Input_data['MUFL']),
+                    "MULL"  : list(self.Input_data['MULL']),
+                    "LUFL"  : list(self.Input_data['LUFL']),
+                    "LULL"  : list(self.Input_data['LULL']),
+                    "OT"    : list(self.Input_data['OT']),
+        }
 
-        params = InputSeq.model_dump_json()
-        response = requests.post(pred_url, json=params, headers=header)
+        response = requests.post(pred_url, json=reqData, headers=header)
         print(response.status_code)
-        print(response.json())        
+        resDict = response.json()
+        col = ['date', 'HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT']
+        data = []
+        for item in col :
+            data.append(resDict['prediction'][item])
+        self.predict_response = pd.DataFrame(data=np.array(data).T, columns=col)
+
+        self.predict_response = self.predict_response.reset_index()
+        self.predict_response.columns = ['Index', 'date', 'HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT']
+        self.predict_response['date'] = pd.to_datetime(self.predict_response['date'])
+
+        # view widget table setting
+        self.window.predict_tableView.setColumnCount(9)
+        self.window.predict_tableView.setHorizontalHeaderLabels(
+                        ['Index', 'date', 'HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT'])
+        count = self.predict_response.shape[0]
+        self.window.predict_tableView.setRowCount(count)
+        for x in range(count):
+            Index = self.predict_response.iloc[x,0]
+            date  = self.predict_response.iloc[x,1]
+            HUFL  = self.predict_response.iloc[x,2]
+            HULL  = self.predict_response.iloc[x,3]
+            MUFL  = self.predict_response.iloc[x,4]
+            MULL  = self.predict_response.iloc[x,5]
+            LUFL  = self.predict_response.iloc[x,6]
+            LULL  = self.predict_response.iloc[x,7]
+            OT    = self.predict_response.iloc[x,8]
+            
+            self.window.predict_tableView.setItem(x, 0, QTableWidgetItem(str(Index)))
+            self.window.predict_tableView.setItem(x, 1, QTableWidgetItem(str(date)))
+            self.window.predict_tableView.setItem(x, 2, QTableWidgetItem(str(HUFL)))
+            self.window.predict_tableView.setItem(x, 3, QTableWidgetItem(str(HULL)))
+            self.window.predict_tableView.setItem(x, 4, QTableWidgetItem(str(MUFL)))
+            self.window.predict_tableView.setItem(x, 5, QTableWidgetItem(str(MULL)))
+            self.window.predict_tableView.setItem(x, 6, QTableWidgetItem(str(LUFL)))
+            self.window.predict_tableView.setItem(x, 7, QTableWidgetItem(str(LULL)))
+            self.window.predict_tableView.setItem(x, 8, QTableWidgetItem(str(OT)))
 
     @QtCore.Slot()
     def DataPlot(self):
+        pass
         # 임시 DB 연결과 테이블 조회
-        with self.engine.connect() as conn:
-            rows = conn.execute(select(
-                        ETT_H_1.Index,
+        # with self.engine.connect() as conn:
+        #     rows = conn.execute(select(
+        #                 ETT_H_1.Index,
 
-                        ).limit(15)).all()
-        self.graph.show()
+        #                 ).limit(15)).all()
+        # self.graph.show()
 
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
