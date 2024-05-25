@@ -9,4 +9,4 @@ class DataInput(BaseModel):
 
 
 class PredictOutput(BaseModel):
-    prediction : int
+    prediction : list[float] = Field()
