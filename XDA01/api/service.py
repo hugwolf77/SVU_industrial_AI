@@ -18,7 +18,7 @@ from MLmodels.DLM import DLM
 logger = logging.getLogger("service_DMms")
 
 api = FastAPI()
-print(f"pwd: {os.getcwd()}")
+# print(f"pwd: {os.getcwd()}")
 api.mount("/static", StaticFiles(directory="./api/static"), name="static")
 
 templates = Jinja2Templates(directory="./api/templates")

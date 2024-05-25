@@ -25,6 +25,7 @@ class Modelargs:
     data             = 'ETTh1'           # dataset type
     root_path        = './DB/storage/ETT/'     # root path of the data file
     data_path        = 'ETTh1.csv'       # data file
+    direct_pred_input = None
     features         = 'MS'               # forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate
     target           = 'OT'              # target feature in S or MS task
     freq             = 'h'               # freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h
@@ -52,7 +53,7 @@ class Modelargs:
     embed            = 'timeF'   # time features encoding, options:[timeF, fixed, learned]'
     activation       = 'gelu'    # activation
     output_attention = True      # whether to output attention in ecoder
-    do_predict       = True      # whether to predict unseen future data
+    do_predict       = False      # whether to predict unseen future data
     # optimization
     num_workers   = 10        # data loader num workers
     itr           = 1         # experiments times

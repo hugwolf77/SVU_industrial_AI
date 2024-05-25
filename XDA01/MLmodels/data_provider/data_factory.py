@@ -35,6 +35,7 @@ def data_provider(args, flag):
     data_set = Data(
         root_path=args.root_path,
         data_path=args.data_path,
+        direct_data=args.direct_pred_input,
         flag=flag,
         size=[args.seq_len, args.label_len, args.pred_len],
         features=args.features,

@@ -131,21 +131,25 @@ def model_train_test(trainset):
 
 if __name__ == "__main__":
 
-    # init_DB_and_TB()
-    if sys.argv[1] == 'DBinit':
-        print("DataBase initiation......")
-        init_DB_and_TB()
-
-    # model train
-    elif sys.argv[1] == 'model_train':
-        try:
-            if sys.argv[1] == 'model_train':
-                print("model train start......")
-                trainset = 0
-                model_train_test(trainset)
-        except Exception as e: 
-            print(f"model train error.....\n{e}")
-    
     # api start
-    else:
+    if len(sys.argv) == 1:
         apiRun(service_url,service_port)
+
+    elif len(sys.argv) == 2:
+        # init_DB_and_TB()
+        if sys.argv[1] == 'DBinit':
+            print("DataBase initiation......")
+            init_DB_and_TB()
+
+        # model train
+        elif sys.argv[1] == 'model_train':
+            try:
+                if sys.argv[1] == 'model_train':
+                    print("model train start......")
+                    trainset = 0
+                    model_train_test(trainset)
+            except Exception as e: 
+                print(f"model train error.....\n{e}")
+        else:
+            print(f"if ['DBinit', 'model_train'] is not selected One option , there are no other options")
+    

@@ -3,6 +3,7 @@ import json
 import logging
 import random
 from datetime import datetime
+from pytz import timezone
 
 import asyncio
 from contextlib import asynccontextmanager
@@ -16,6 +17,7 @@ from api.model.dataclass import DataInput, PredictOutput
 
 import torch
 from MLmodels.DLM import DLM
+import pandas as pd
 from config import Modelargs
 
 logger = logging.getLogger("service_DMms")
@@ -36,12 +38,10 @@ if args.use_gpu and args.use_multi_gpu:
 
 print(f"model_args : \n {args}")
 
-setLabel = datetime.now().strftime('%Y_%m_%d')
-
 @asynccontextmanager
 async def lifespan(app: APIRouter, NM):
     # Load the ML model
-    mlModel = DLM(args).predict(setLabel, load=True)
+    mlModel["DML"] = DLM(args)
     yield
     mlModel.clear()
 
@@ -55,22 +55,22 @@ DLms.mount("/static", StaticFiles(directory="api/static"), name="static")
 
 ### model
 
-random.seed()
-async def generate_random_data(request: Request):
-    """
-    Generates random value between 0 and 100
-    :return: String containing current timestamp (YYYY-mm-dd HH:MM:SS) and randomly generated data.
-    """
-    while True:
-        json_data = json.dumps(
-            {
-                "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "value": random.random() * 100,
-            }
-        )
-        yield f"data:{json_data}\n\n"
-        # yield f"{json_data}\n\n"
-        await asyncio.sleep(1)
+# random.seed()
+# async def generate_random_data(request: Request):
+#     """
+#     Generates random value between 0 and 100
+#     :return: String containing current timestamp (YYYY-mm-dd HH:MM:SS) and randomly generated data.
+#     """
+#     while True:
+#         json_data = json.dumps(
+#             {
+#                 "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+#                 "value": random.random() * 100,
+#             }
+#         )
+#         yield f"data:{json_data}\n\n"
+#         # yield f"{json_data}\n\n"
+#         await asyncio.sleep(1)
 
 @DLms.get("/", response_class=HTMLResponse) # Route Path
 async def DLms_branch_home(request: Request):
@@ -79,23 +79,37 @@ async def DLms_branch_home(request: Request):
     return templates.TemplateResponse("index_dlm.html",{"request":request})
 
 
-@DLms.get("/example", response_class=HTMLResponse) # Route Path
-async def DLms_branch_home(request: Request):
-    client_ip = request.client.host
-    logger.info("Client %s connected", client_ip)
-    return templates.TemplateResponse("DLms_home.html",{"request":request})
+# @DLms.get("/example", response_class=HTMLResponse) # Route Path
+# async def DLms_branch_home(request: Request):
+#     client_ip = request.client.host
+#     logger.info("Client %s connected", client_ip)
+#     return templates.TemplateResponse("DLms_home.html",{"request":request})
 
 
-@DLms.get("/fakeStream", response_class=HTMLResponse) # Route Path
-async def chart_data(request: Request):
-    response = StreamingResponse(generate_random_data(request), media_type='text/event-stream') # application/x-ndjson
-    response.headers["Cache-Control"] = "no-cache"
-    response.headers["X-Accel-Buffering"] = "no"
-    return response 
+# @DLms.get("/fakeStream", response_class=HTMLResponse) # Route Path
+# async def chart_data(request: Request):
+#     response = StreamingResponse(generate_random_data(request), media_type='text/event-stream') # application/x-ndjson
+#     response.headers["Cache-Control"] = "no-cache"
+#     response.headers["X-Accel-Buffering"] = "no"
+#     return response 
 
 @DLms.post("/predict", tags=['DLM'], response_model=PredictOutput)
-async def NN01_predict(request_input: DataInput, request: Request):
+async def DLM_predict(request_input: DataInput, request: Request):
     client_ip = request.client.host
     logger.info("Client %s connected for prediction result", client_ip)
-    result =  mlModel["predict"](request_input.x)
+    data = {
+         'date' : request_input.date, 
+         'HUFL' : request_input.HUFL, 
+         'HULL' : request_input.HULL, 
+         'MUFL' : request_input.MUFL, 
+         'MULL' : request_input.MULL, 
+         'LUFL' : request_input.LUFL, 
+         'LULL' : request_input.LULL, 
+         'OT' : request_input.OT,
+    }
+    args.direct_pred_input = pd.DataFrame(data)
+    print(args.direct_pred_input)
+    raise
+    setLabel = datetime.now(timezone('Asia/Seoul')).strftime('%Y_%m_%d')
+    result =  mlModel["DLM"].predict(setLabel,load=True)
     return {'prediction' : result}

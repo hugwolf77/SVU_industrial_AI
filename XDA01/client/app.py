@@ -2,6 +2,9 @@
 import sys
 import os
 import logging
+from datetime import datetime
+from pytz import timezone
+
 # pyside6 window
 from PySide6 import QtCore
 from PySide6.QtCore import QFile, QIODevice 
@@ -11,10 +14,25 @@ from PySide6.QtUiTools import QUiLoader
 from sqlalchemy import select
 from DB.connect import conn_DB
 from DB.DBmodel.dataTB import (Base, ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2)
+import numpy as np
 import pandas as pd
+from typing import List
+from pydantic import BaseModel, Field
 # predict request 
 import requests
 import json
+
+class DataInput(BaseModel):
+    # ReqTime : str = Field(min_length=4, max_length=10)
+    Index : List[int] = Field()
+    date : List[datetime]   = Field() 
+    HUFL : List[float] = Field()
+    HULL : List[float] = Field()
+    MUFL : List[float] = Field()
+    MULL : List[float] = Field()
+    LUFL : List[float] = Field()
+    LULL : List[float] = Field()
+    OT : List[float] = Field()
 
 
 class Client(QWidget):
@@ -88,6 +106,10 @@ class Client(QWidget):
         elif os.path.splitext(self.select_data)[1] == '.xlsx':
             self.Input_data =  pd.read_excel(self.select_data)
         
+        self.Input_data.reset_index()
+        self.Input_data.columns = ['Index', 'date', 'HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT']
+        self.Input_data['date'] = pd.to_datetime(self.Input_data['date'])
+
         # view widget table setting
         self.window.input_tableView.setColumnCount(9)
         self.window.input_tableView.setHorizontalHeaderLabels(
@@ -100,28 +122,28 @@ class Client(QWidget):
         self.window.input_tableView.setRowCount(count)
         
         #row 리스트만큼 반복하며 Table에 DB 값을 넣는다.
-        for x in range(count+1):
+        for x in range(count):
             # Input_data DataFrame 내부의 column 각 값을 변수에 저장
-            Index = self.Input_data.iloc[x,:]
-            date  = self.Input_data.iloc[x,:]
-            HUFL  = self.Input_data.iloc[x,:]
-            HULL  = self.Input_data.iloc[x,:]
-            MUFL  = self.Input_data.iloc[x,:]
-            MULL  = self.Input_data.iloc[x,:]
-            LUFL  = self.Input_data.iloc[x,:]
-            LULL  = self.Input_data.iloc[x,:]
-            OT    = self.Input_data.iloc[x,:]
+            Index = self.Input_data.iloc[x,0]
+            date  = self.Input_data.iloc[x,1]
+            HUFL  = self.Input_data.iloc[x,2]
+            HULL  = self.Input_data.iloc[x,3]
+            MUFL  = self.Input_data.iloc[x,4]
+            MULL  = self.Input_data.iloc[x,5]
+            LUFL  = self.Input_data.iloc[x,6]
+            LULL  = self.Input_data.iloc[x,7]
+            OT    = self.Input_data.iloc[x,8]
             
             #테이블의 각 셀에 값 입력
             self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(Index)))
-            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(date)))
-            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(HUFL)))
-            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(HULL)))
-            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(MUFL)))
-            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(MULL)))
-            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(LUFL)))
-            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(LULL)))
-            self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(OT)))
+            self.window.input_tableView.setItem(x, 1, QTableWidgetItem(str(date)))
+            self.window.input_tableView.setItem(x, 2, QTableWidgetItem(str(HUFL)))
+            self.window.input_tableView.setItem(x, 3, QTableWidgetItem(str(HULL)))
+            self.window.input_tableView.setItem(x, 4, QTableWidgetItem(str(MUFL)))
+            self.window.input_tableView.setItem(x, 5, QTableWidgetItem(str(MULL)))
+            self.window.input_tableView.setItem(x, 6, QTableWidgetItem(str(LUFL)))
+            self.window.input_tableView.setItem(x, 7, QTableWidgetItem(str(LULL)))
+            self.window.input_tableView.setItem(x, 8, QTableWidgetItem(str(OT)))
 
     @QtCore.Slot()
     def Predict_result(self):
@@ -129,10 +151,21 @@ class Client(QWidget):
             "Content-type" : "application/json",
             "accept": "application/json",
         }
-        pred_url = "http://localhost:8000/DLms/predict"
-        params={
-            
-        }
+        pred_url = "http://localhost:8000/DLM/predict"
+
+        InputSeq = DataInput(
+                    Index = list(self.Input_data['Index']),
+                    date  = list(self.Input_data['date']),
+                    HUFL  = list(self.Input_data['HUFL']),
+                    HULL  = list(self.Input_data['HULL']),
+                    MUFL  = list(self.Input_data['MUFL']),
+                    MULL  = list(self.Input_data['MULL']),
+                    LUFL  = list(self.Input_data['LUFL']),
+                    LULL  = list(self.Input_data['LULL']),
+                    OT    = list(self.Input_data['OT']),
+                    )
+
+        params = InputSeq.model_dump_json()
         response = requests.post(pred_url, json=params, headers=header)
         print(response.status_code)
         print(response.json())        

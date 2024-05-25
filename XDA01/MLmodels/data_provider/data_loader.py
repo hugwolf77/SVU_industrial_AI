@@ -13,7 +13,7 @@ warnings.filterwarnings('ignore')
 
 class Dataset_ETT_hour(Dataset):
     def __init__(self, root_path, flag='train', size=None,
-                 features='S', data_path='ETTh1.csv',
+                 features='S', data_path='ETTh1.csv', direct_data = None,
                  target='OT', scale=True, timeenc=0, freq='h', train_only=False):
         # size [seq_len, label_len, pred_len]
         # info
@@ -101,7 +101,7 @@ class Dataset_ETT_hour(Dataset):
 
 class Dataset_ETT_minute(Dataset):
     def __init__(self, root_path, flag='train', size=None,
-                 features='S', data_path='ETTm1.csv',
+                 features='S', data_path='ETTm1.csv', direct_data = None,
                  target='OT', scale=True, timeenc=0, freq='t', train_only=False):
         # size [seq_len, label_len, pred_len]
         # info
@@ -191,7 +191,7 @@ class Dataset_ETT_minute(Dataset):
 
 class Dataset_Custom(Dataset):
     def __init__(self, root_path, flag='train', size=None,
-                 features='S', data_path='ETTh1.csv',
+                 features='S', data_path='ETTh1.csv', direct_data = None,
                  target='OT', scale=True, timeenc=0, freq='h', train_only=False):
         # size [seq_len, label_len, pred_len]
         # info
@@ -294,8 +294,8 @@ class Dataset_Custom(Dataset):
     
 
 class Dataset_Pred(Dataset):
-    def __init__(self, root_path, flag='pred', size=None,
-                 features='S', data_path='ETTh1.csv',
+    def __init__(self, root_path, flag='pred', size=None, 
+                 features='S', data_path='ETTh1.csv', direct_data = None,
                  target='OT', scale=True, inverse=False, timeenc=0, freq='15min', cols=None, train_only=False):
         # size [seq_len, label_len, pred_len]
         # info
@@ -319,12 +319,17 @@ class Dataset_Pred(Dataset):
         self.cols = cols
         self.root_path = root_path
         self.data_path = data_path
+
+        self.direct_data = direct_data
+
         self.__read_data__()
 
     def __read_data__(self):
         self.scaler = StandardScaler()
-        df_raw = pd.read_csv(os.path.join(self.root_path,
-                                          self.data_path))
+        # df_raw = pd.read_csv(os.path.join(self.root_path,
+        #                                   self.data_path))
+        df_raw = self.direct_data
+
         '''
         df_raw.columns: ['date', ...(other features), target feature]
         '''
