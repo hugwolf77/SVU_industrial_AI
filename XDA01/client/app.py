@@ -9,16 +9,27 @@ from PySide6 import QtCore
 from PySide6.QtCore import QFile, QIODevice 
 from PySide6.QtWidgets import (QApplication, QWidget, QFileDialog, QTableWidget, QTableWidgetItem)
 from PySide6.QtUiTools import QUiLoader
+
 # data read
 # from sqlalchemy import select
 # from DB.connect import conn_DB
 # from DB.DBmodel.dataTB import (Base, ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2)
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
+from matplotlib.figure import Figure
+
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 # predict request 
 import requests
-import json
+
+
+class MplCanvas(FigureCanvasQTAgg):
+    def __init__(self, parent=None, width=5, heigth=4, dpi=150):
+        fig = Figure(figsize=(width, heigth), dpi=dpi, facecolor='gray')
+        self.axes = fig.add_subplot(111)
+        super(MplCanvas, self).__init__(fig)
 
 class DataInput(BaseModel):
     # ReqTime : str = Field(min_length=4, max_length=10)
@@ -47,25 +58,29 @@ class Client(QWidget):
         self.window = self.SetupUI()
         self.file_navi = QFileDialog()
         self.window.setWindowTitle('TSF_Model_Client')
-        # input data select
+        # select input data file
         self.window.path_edit.returnPressed.connect(self.Input_path)
         self.window.Path_btn.clicked.connect(self.file_exeplore)
         self.window.select.clicked.connect(self.Select_data)
-        # predict 
-        self.window.predict.clicked.connect(self.Predict_result)
-        # select input data file
         self.select_data = ''
-        # load data
+        # predict 
         self.Input_data = pd.DataFrame()
-        # DB connect
-        # self.engine = conn_DB()
-        # Predict
+        self.window.predict.clicked.connect(self.Predict_result)
         self.predict_response = pd.DataFrame()
-        # Graph
-        self.window.show()
+        ## load data DB connect
+        # self.engine = conn_DB()
         
+        # Graph
+        self.canvas = MplCanvas(self, width=5, heigth=4, dpi=100)
+        toolbar = NavigationToolbar2QT(self.canvas, self)
+        self.window.graph_Layout.addWidget(toolbar)
+        self.window.graph_Layout.addWidget(self.canvas)
+        self.window.show_graph_btn.clicked.connect(self.show_DataPlot)
+        
+        self.window.show()
+
     def SetupUI(self):
-        ui_file_name = resource_path("client/uiform/form.ui")
+        ui_file_name = resource_path("client/uiform/form2.ui")
         ui_file = QFile(ui_file_name)
         if not ui_file.open(QIODevice.ReadOnly):
             print(f"Cannot open {ui_file_name}: {ui_file.errorString()}")
@@ -123,13 +138,13 @@ class Client(QWidget):
             # Input_data DataFrame 내부의 column 각 값을 변수에 저장
             Index = self.Input_data.iloc[x,0]
             date  = self.Input_data.iloc[x,1]
-            HUFL  = self.Input_data.iloc[x,2]
-            HULL  = self.Input_data.iloc[x,3]
-            MUFL  = self.Input_data.iloc[x,4]
-            MULL  = self.Input_data.iloc[x,5]
-            LUFL  = self.Input_data.iloc[x,6]
-            LULL  = self.Input_data.iloc[x,7]
-            OT    = self.Input_data.iloc[x,8]
+            HUFL  = self.Input_data.iloc[x,2].round(3)
+            HULL  = self.Input_data.iloc[x,3].round(3)
+            MUFL  = self.Input_data.iloc[x,4].round(3)
+            MULL  = self.Input_data.iloc[x,5].round(3)
+            LUFL  = self.Input_data.iloc[x,6].round(3)
+            LULL  = self.Input_data.iloc[x,7].round(3)
+            OT    = self.Input_data.iloc[x,8].round(3)
             
             #테이블의 각 셀에 값 입력
             self.window.input_tableView.setItem(x, 0, QTableWidgetItem(str(Index)))
@@ -174,6 +189,8 @@ class Client(QWidget):
         self.predict_response = self.predict_response.reset_index()
         self.predict_response.columns = ['Index', 'date', 'HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT']
         self.predict_response['date'] = pd.to_datetime(self.predict_response['date'])
+        self.predict_response[['HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT']] \
+            = self.predict_response[['HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT']].astype(float)
 
         # view widget table setting
         self.window.predict_tableView.setColumnCount(9)
@@ -184,13 +201,13 @@ class Client(QWidget):
         for x in range(count):
             Index = self.predict_response.iloc[x,0]
             date  = self.predict_response.iloc[x,1]
-            HUFL  = self.predict_response.iloc[x,2]
-            HULL  = self.predict_response.iloc[x,3]
-            MUFL  = self.predict_response.iloc[x,4]
-            MULL  = self.predict_response.iloc[x,5]
-            LUFL  = self.predict_response.iloc[x,6]
-            LULL  = self.predict_response.iloc[x,7]
-            OT    = self.predict_response.iloc[x,8]
+            HUFL  = self.predict_response.iloc[x,2].round(3)
+            HULL  = self.predict_response.iloc[x,3].round(3)
+            MUFL  = self.predict_response.iloc[x,4].round(3)
+            MULL  = self.predict_response.iloc[x,5].round(3)
+            LUFL  = self.predict_response.iloc[x,6].round(3)
+            LULL  = self.predict_response.iloc[x,7].round(3)
+            OT    = self.predict_response.iloc[x,8].round(3)
             
             self.window.predict_tableView.setItem(x, 0, QTableWidgetItem(str(Index)))
             self.window.predict_tableView.setItem(x, 1, QTableWidgetItem(str(date)))
@@ -203,8 +220,33 @@ class Client(QWidget):
             self.window.predict_tableView.setItem(x, 8, QTableWidgetItem(str(OT)))
 
     @QtCore.Slot()
-    def DataPlot(self):
-        pass
+    def show_DataPlot(self):
+        # show data graph & update
+        self.canvas.axes.cla() # clear canvers
+        if (self.Input_data.shape[0] > 0) and (self.Input_data.shape[1] > 0):
+            self.Input_data = self.Input_data.round(3)
+            input_line = self.canvas.axes.plot(self.Input_data.iloc[:,1],self.Input_data.iloc[:,8]
+                                  ,lw=1, color="blue"
+                                  ,marker='o',markerfacecolor='yellow', markersize=0.5, markeredgewidth=0.1)
+        if (self.predict_response.shape[0] > 0) and (self.predict_response.shape[1] > 0):
+            self.predict_response =  self.predict_response.round(3)
+            pred_line = self.canvas.axes.plot(self.predict_response.iloc[:,1],self.predict_response.iloc[:,8]
+                                  ,lw=1, ls='-',color="red"
+                                  ,marker='^',markerfacecolor='yellow', markersize=0.5, markeredgewidth=0.1)
+        ymax = max(self.Input_data.iloc[:,8])*1.2
+        ymin = min(self.Input_data.iloc[:,8])*1.2
+        self.canvas.axes.vlines(self.Input_data.iloc[-1,1],ymax=ymax, ymin=ymin, color="yellow")
+        # xticks= self.canvas.axes.get_xticks()
+        # xticksSet=self.canvas.axes.set_xticks(xticks)
+        # ticks_font={'fontsize':4, 'fontweight':'bold'}
+        # self.canvas.axes.set_xticklabels(xticks, rotation = 70, fontdict=ticks_font)
+        title_font={'fontsize':10, 'fontweight':'bold'}
+        self.canvas.axes.set_title("Electric Transformer Oil Temperature Sensor Predict", fontdict=title_font)
+        self.canvas.axes.grid(lw=1,ls=':', alpha=0.25)
+        self.canvas.axes.yaxis.grid(True, color='black')
+        self.canvas.draw()
+
+    # def show_predict_server DB data
         # 임시 DB 연결과 테이블 조회
         # with self.engine.connect() as conn:
         #     rows = conn.execute(select(
