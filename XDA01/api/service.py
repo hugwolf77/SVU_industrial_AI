@@ -8,6 +8,7 @@ import uvicorn
 
 # routing path
 from .router.DLms import DLms 
+from .router.Fstream import Fstream
 
 # logging
 # logging.basicConfig(
@@ -24,6 +25,7 @@ api.mount("/static", StaticFiles(directory="./api/static"), name="static")
 templates = Jinja2Templates(directory="./api/templates")
 
 api.include_router(DLms)
+api.include_router(Fstream)
 
 @api.get("/", response_class=HTMLResponse) # root
 def index(request: Request):

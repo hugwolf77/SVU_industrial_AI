@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>Item Details</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <center>
+        <h1><a> This is DLms Page </a></h1>
+        <h2><a> /files : files </a></h2>
+        <h2><a> /uploadfile : upload files </a></h2>
+
+        <form action="/Fstream/files/" enctype="multipart/form-data" method="post">
+            <input name="file" type="file" multiple>
+            <input type="submit">
+        </form>
+        <form action="/Fstream/uploadfiles/" enctype="multipart/form-data" method="post">
+            <input name="file" type="file" multiple>
+            <input type="submit">
+        </form>
+
+    </center>
+
+</body>
+</html>
