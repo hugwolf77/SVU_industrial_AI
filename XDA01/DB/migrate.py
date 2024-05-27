@@ -45,6 +45,7 @@ def comfirmTB(TB,iDate):
     stmt = select(TB).where(TB.date.in_([iDate]))
     for Item in session.scalars(stmt):
         print(Item)
+    session.close()
 
 if __name__=="__main__":
     # DataBase initiation
