@@ -9,22 +9,21 @@ from ..utils.timefeatures import time_features
 import warnings
 
 from DB.connect import conn_DB, get_session
-from DB.crud import get_ETT_DataReed
-
-from DB.DBmodel.dataTB import ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2
+# from DB.DBmodel.dataTB import ETT_H_1, ETT_H_2, ETT_M_1, ETT_M_2
 
 warnings.filterwarnings('ignore')
 
-db_Table_list = {
-                    ETT_H_1, ETT_H_2, ETT_M_1, ETT_H_2}
+db_Table_list = { 'ETTh1': 'ETT_H_1',
+                  'ETTh2': 'ETT_H_2', 
+                  'ETTm1': 'ETT_M_1',
+                  'ETTm2': 'ETT_M_2' }
 
-def load_data_from_db():
+def load_data_from_db(dbTB):
     db_con  = conn_DB()
-    with db_con.connect() as con:
-        get_ETT_DataReed(con,)
-
-
-
+    with db_con.connect() as conn:
+        data = pd.read_sql_table(dbTB, conn)
+        # print(data.head(3))
+    return data
 
 class Dataset_ETT_hour(Dataset):
     def __init__(self, root_path, flag='train', size=None,
@@ -57,8 +56,13 @@ class Dataset_ETT_hour(Dataset):
 
     def __read_data__(self):
         self.scaler = StandardScaler()
-        df_raw = pd.read_csv(os.path.join(self.root_path,
-                                          self.data_path))
+        # df_raw = pd.read_csv(os.path.join(self.root_path,
+        #                                   self.data_path))
+                                 
+        df_raw = load_data_from_db(db_Table_list[self.data_path.rstrip('.csv')])
+        df_raw = df_raw.drop('index', axis=1)
+        # print(df_raw.head(10))
+        # raise
 
         border1s = [0, 12 * 30 * 24 - self.seq_len, 12 * 30 * 24 + 4 * 30 * 24 - self.seq_len]
         border2s = [12 * 30 * 24, 12 * 30 * 24 + 4 * 30 * 24, 12 * 30 * 24 + 8 * 30 * 24]

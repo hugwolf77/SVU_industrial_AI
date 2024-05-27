@@ -29,7 +29,7 @@ def rawData(dataTags):
         dfList.append(df)
     return dfList
 
-def migrate(nameTB_mbr:str, migData:pd.DataFrame, if_exists = 'append'): # 'replace', 'fail'
+def migrate(nameTB_mbr:str, migData:pd.DataFrame, if_exists = 'replace'): # 'replace', 'fail'
     # 데이터 입력
     # nameTB_mbr : 'ETT_H_1'
     with db_con.connect() as con:
@@ -52,7 +52,7 @@ if __name__=="__main__":
     init_DB()
 
     # raw data file load to DataFrame
-    dataTags = {'ETT':'DB/storage/ETDataset-raw/'}
+    dataTags = {'ETT':'DB/storage/ETT/'}
     dfList = rawData(dataTags)
 
     # migration rawData to DB Table

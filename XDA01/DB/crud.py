@@ -8,11 +8,10 @@ def get_items(db: Session):
 def get_item(ind,db:Session):
     return db.query(ETT_H_1).filter(ETT_H_1.Index.in_([ind])).first()
 
-
-def get_ETT_DataReed(db_con, TB):
-    stmt = select(TB)
-    with Session(db_con) as ses:
-        for Item in ses.scalars(stmt):
-            print(Item)
+# def get_ETT_DataReed(db_con, TB):
+#     stmt = select(TB)
+#     with Session(db_con) as ses:
+#         data = ses.execute(stmt)
+#     return data
 
 
