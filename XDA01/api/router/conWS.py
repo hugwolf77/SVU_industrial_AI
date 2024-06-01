@@ -14,7 +14,7 @@ from fastapi import (
 from fastapi.responses import HTMLResponse
 
 
-filePath = './API_app/templates/Chat_03.html'
+filePath = './api/templates/Chat_03.html'
 with open(filePath, 'r') as f:
     html = f.read()
 

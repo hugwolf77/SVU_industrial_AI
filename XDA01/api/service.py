@@ -9,6 +9,7 @@ import uvicorn
 # routing path
 from .router.DLms import DLms 
 from .router.Fstream import Fstream
+from .router.conWS import conWS
 
 # logging
 # logging.basicConfig(
@@ -26,6 +27,7 @@ templates = Jinja2Templates(directory="./api/templates")
 
 api.include_router(DLms)
 api.include_router(Fstream)
+api.include_router(conWS)
 
 @api.get("/", response_class=HTMLResponse) # root
 def index(request: Request):
