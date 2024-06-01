@@ -19,7 +19,7 @@ def init_DB():
 def rawData(dataTags):
     # raw data Tag : ex 'ETT'
     filePath = os.path.join(os.getcwd()+dataTags['ETT'])
-    fList = [file for file in os.listdir(filePath) if os.path.splitext(file)[1] == '.csv'  ] 
+    fList = [file for file in os.listdir(filePath) if os.path.splitext(file)[1] == '.csv' ] 
     colname = [ #Index,
                     'date', 'HUFL', 'HULL', 'MUFL', 'MULL', 'LUFL', 'LULL', 'OT', ]
     dfList = []
