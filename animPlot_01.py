@@ -21,8 +21,10 @@ animation = FuncAnimation(
 						  func=updated_data,
 						  frames=len(t),
 						  interval=25,
+						  repeat=False,
 						  
 					)
+# animation.save("animation_sin.gif")
 
 
 plt.show()
