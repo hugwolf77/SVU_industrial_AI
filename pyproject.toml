@@ -22,11 +22,16 @@ scikit-learn = "^1.5.0"
 torch = {version = "^2.3.0+cu121", source = "pytorch"}
 torchvision = {version = "^0.18.0+cu121", source = "pytorch"}
 torchaudio = {version = "^2.3.0+cu121", source = "pytorch"}
+statsmodels = "^0.14.2"
 
 [[tool.poetry.source]]
 name = "pytorch"
 url = "http://download.pytorch.org/whl/cu121"
 priority = "explicit"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
 
 [build-system]
 requires = ["poetry-core"]
