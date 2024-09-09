@@ -24,6 +24,7 @@ torchvision = {version = "^0.18.0+cu121", source = "pytorch"}
 torchaudio = {version = "^2.3.0+cu121", source = "pytorch"}
 statsmodels = "^0.14.2"
 scienceplots = "^2.1.1"
+psycopg2-binary = "^2.9.9"
 
 [[tool.poetry.source]]
 name = "pytorch"
