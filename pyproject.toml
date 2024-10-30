@@ -25,6 +25,12 @@ torchaudio = {version = "^2.3.0+cu121", source = "pytorch"}
 statsmodels = "^0.14.2"
 scienceplots = "^2.1.1"
 psycopg2-binary = "^2.9.9"
+openpyxl = "^3.1.5"
+torchsummary = "^1.5.1"
+tqdm = "^4.66.5"
+opencv-contrib-python = "4.8.1.78"
+mediapipe = "0.10.7"
+pillow = "10.1.0"
 
 [[tool.poetry.source]]
 name = "pytorch"

@@ -5,10 +5,11 @@ share/
 cv2_env/
 doc/
 
+*-ubyte
 
 *.bak
 *.log
-
+*.gz
 
 # 2023.04.26
 
