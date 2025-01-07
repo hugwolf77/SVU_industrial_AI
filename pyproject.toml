@@ -31,6 +31,10 @@ tqdm = "^4.66.5"
 opencv-contrib-python = "4.8.1.78"
 mediapipe = "0.10.7"
 pillow = "10.1.0"
+pytube = "^15.0.0"
+pytubefix = "^8.2.0"
+dlib = "^19.24.6"
+yfinance = "^0.2.49"
 
 [[tool.poetry.source]]
 name = "pytorch"

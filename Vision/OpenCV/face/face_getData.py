@@ -13,8 +13,7 @@ target_cnt = 400        # 수집할 사진 갯수
 cnt = 0                 # 사진 촬영 수
 
 # 얼굴 검출 분류기 생성 
-face_classifier = cv2.CascadeClassifier(\
-                    './pre/haarcascade_frontalface_default.xml')
+face_classifier = cv2.CascadeClassifier('./pre/haarcascade_frontalface_default.xml')
 
 # 사용자 이름과 번호를 입력 받아 디렉토리 생성
 name = input("Insert User Name(Only Alphabet):")
